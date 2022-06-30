@@ -1,6 +1,7 @@
 import dash
 from dash.dependencies import Input, Output
 from dash import dcc, html
+import dash_bootstrap_components as dbc
 
 import flask
 import pandas as pd
@@ -487,6 +488,137 @@ def asubkegiatananggaran(requests_pathname_prefix: str = None) -> dash.Dash:
             page_current=0,
             page_size=10,
         )
+
+    return app
+
+def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
+    server = flask.Flask(__name__)
+    server.secret_key = os.environ.get('secret_key', 'secret')
+
+    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix,external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+    app.scripts.config.serve_locally = False
+    dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
+
+    query = db['a_fungsi_anggaran'].aggregate([
+        {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+        {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
+        {"$group": {
+            "_id": {'kode_fungsi': '$kode_fungsi', 'nama_fungsi': '$nama_fungsi'},
+            "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
+        {'$sort': {'_id.kode_fungsi': 1}}
+    ])
+    result = []
+    for q in list(query):
+        r = {
+            'kode_fungsi': q['_id']['kode_fungsi'],
+            'nama_fungsi': q['_id']['nama_fungsi'],
+            'nilaianggaran': "Rp{:,.2f}".format(q['nilaianggaran']),
+        }
+        result.append(r)
+    print(result)
+    df_ = pd.DataFrame(result)
+    df = df_.iloc[:, 0:]
+
+    table_fungsi = dash_table.DataTable(
+            id='table',
+            columns=[
+                {"name": i, "id": i, "deletable": True, "selectable": True} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            editable=True,
+            filter_action="native",
+            sort_action="native",
+            sort_mode="multi",
+            column_selectable="single",
+            row_selectable="multi",
+            row_deletable=True,
+            selected_columns=[],
+            selected_rows=[],
+            page_action="native",
+            page_current=0,
+            page_size=10,
+        )
+
+    import plotly.express as px
+
+    @app.callback(
+        Output(component_id='the_graph', component_property='figure'), Input('intermediate-value', 'data')
+        # [Input(component_id='my_dropdown', component_property='value')]
+    )
+    def update_graph(data):
+        query = db['a_fungsi_anggaran'].aggregate([
+            {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+            {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
+            {"$group": {
+                "_id": {'kode_fungsi': '$kode_fungsi', 'nama_fungsi': '$nama_fungsi'},
+                "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
+            {'$sort': {'_id.kode_fungsi': 1}}
+        ])
+        result = []
+        for q in list(query):
+            r = {
+                'kode_fungsi': q['_id']['kode_fungsi'],
+                'nama_fungsi': q['_id']['nama_fungsi'],
+                'nilaianggaran': q['nilaianggaran']
+            }
+            result.append(r)
+        print(result)
+        df_ = pd.DataFrame(result)
+        df = df_.iloc[:, 0:]
+        dff = df
+        print(dff)
+        piechart = px.pie(
+            df,
+            values='nilaianggaran',
+            names='nama_fungsi',
+            hole=.3,
+            title='Anggaran Berdasarkan Fungsi'
+        )
+        return (piechart)
+
+    @app.callback(
+        Output(component_id='bar_chart', component_property='figure'), Input('intermediate-value', 'data')
+        # [Input(component_id='my_dropdown', component_property='value')]
+    )
+    def update_graph(data):
+        query = db['a_namaaplikasi_anggaran'].aggregate([
+            {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+            {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
+            {"$group": {
+                "_id": {'namaaplikasi': '$namaaplikasi'},
+                "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
+            {'$sort': {'_id.kode_fungsi': 1}}
+        ])
+        result = []
+        for q in list(query):
+            r = {
+                'namaaplikasi': q['_id']['namaaplikasi'],
+                'nilaianggaran': q['nilaianggaran']
+            }
+            result.append(r)
+        print(result)
+        df_ = pd.DataFrame(result)
+        df = df_.iloc[:, 0:]
+        dff = df
+        print(dff)
+        piechart = px.bar(
+            df,
+            x='namaaplikasi',
+            y='nilaianggaran',
+            text_auto='.2s',
+            title='Anggaran Berdasarkan Nama Aplikasi'
+        )
+        return (piechart)
+
+    layout = html.Div([
+        table_fungsi,
+        dcc.Graph(id='the_graph'),
+        dcc.Graph(id='bar_chart'),
+        dcc.Store(id='intermediate-value')
+    ])
+
+    app.layout = layout
 
     return app
 

@@ -224,9 +224,17 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "email": user['email'],
             "photo": user['picture'],
         }
+        from app.dashapp import dashboard
+        dash_app_dashboard = dashboard(
+            requests_pathname_prefix="/dashdashboard/")
+        app.mount("/dashdashboard", WSGIMiddleware(dash_app_dashboard.server))
+
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(dash_app_dashboard.index(), 'html.parser')
+        querydata = soup.footer
     else:
         data = {}
-    return templates.TemplateResponse("dashboard.html", {"request": request, "data": data, "footer":{}})
+    return templates.TemplateResponse("dashboard.html", {"request": request, "data": data, "querydata":querydata})
 
 @app.get('/standardizationakun', include_in_schema=False)
 async def standardizationakun(request: Request, db: Session = Depends(get_db)):

@@ -2,11 +2,21 @@
 
 {% block body %}
 
-<div id="react-entry-point">
-    <div class="_dash-loading">
-        Loading...
+<div id="tableStandardization" class="pt-8 max-w-full max-h-ful overflow-auto" style="width: 1200px;height: 2000px;">
+    <div id="react-entry-point">
+        <div class="_dash-loading">
+            Loading...
+        </div>
+        <div id="_dash-global-error-container" class="_dash-global-error-container">
+            Loading...
+        </div>
     </div>
+    {{ querydata|safe }}
 </div>
-{{ footer|safe }}
 
 {% endblock %}
+
+
+
+
+
