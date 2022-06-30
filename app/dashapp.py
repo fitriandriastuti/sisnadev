@@ -292,7 +292,8 @@ def apemdafungsianggaran(requests_pathname_prefix: str = None) -> dash.Dash:
 
     def slow_processing_step(value):
         query = db['a_pemda_fungsi_anggaran'].aggregate([
-            {'$match': {'nilaianggaran': {'$ne': float('NaN')}, 'namapemda': value}},
+            {'$match': {'nilaianggaran': {'$ne': float('NaN')}, 'namapemda': value, 'kode_fungsi': {'$exists': 'true', '$ne': None}}},
+            # {'$match': {'nilaianggaran': {'$ne': float('NaN')}, 'namapemda': value}},
             {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
             {"$group": {
                 "_id": {'kodepemda': '$kodepemda','namapemda': '$namapemda', 'kode_fungsi': "$kode_fungsi", 'nama_fungsi': "$nama_fungsi"},
@@ -503,7 +504,8 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
 
     query = db['a_fungsi_anggaran'].aggregate([
-        {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+        # { '$project': { 'kode_fungsi': { '$ifNull': ["$kode_fungsi", "Unspecified"]} } },
+        {'$match': {'kode_fungsi': { '$exists': 'true', '$ne': None}}},
         {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
         {"$group": {
             "_id": {'kode_fungsi': '$kode_fungsi', 'nama_fungsi': '$nama_fungsi'},
@@ -550,7 +552,7 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     )
     def update_graph(data):
         query = db['a_fungsi_anggaran'].aggregate([
-            {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+            {'$match': {'kode_fungsi': { '$exists': 'true', '$ne': None}}},
             {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
             {"$group": {
                 "_id": {'kode_fungsi': '$kode_fungsi', 'nama_fungsi': '$nama_fungsi'},
@@ -585,12 +587,12 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     )
     def update_graph(data):
         query = db['a_namaaplikasi_anggaran'].aggregate([
-            {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
+            {'$match': {'namaaplikasi': { '$exists': 'true', '$ne': None}}},
             {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
             {"$group": {
                 "_id": {'namaaplikasi': '$namaaplikasi'},
                 "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-            {'$sort': {'_id.kode_fungsi': 1}}
+            {'$sort': {'_id.namaaplikasi': 1}}
         ])
         result = []
         for q in list(query):
