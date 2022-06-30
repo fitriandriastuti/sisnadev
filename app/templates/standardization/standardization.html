@@ -1,0 +1,43 @@
+{% extends 'layout_main.html' %}
+
+{% block body %}
+
+<!--<div>-->
+<!--    <div class="flex">-->
+<!--        <div class="w-full">-->
+<!--&lt;!&ndash;            <label for="" class="text-xs font-semibold px-1">Province: </label>&ndash;&gt;-->
+<!--            <div class="flex">-->
+<!--                <select class="w-full -ml-2 pl-2 pr-3 py-2.5 px-5 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"-->
+<!--                        id="prov" name="prov">-->
+<!--                    <option value="">Choose Province</option>-->
+<!--                    {% for province in allprovince %}-->
+<!--                        <option value="{{ province.prov }}">{{ province.nama }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="w-full">-->
+<!--            <div class="inline-block mr-2">-->
+<!--                <button type="button" id="submit" name="submit"-->
+<!--                        class="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md bg-purple-500 hover:bg-purple-600 hover:shadow-lg">-->
+<!--                    Search Standardization Account-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div id="tableStandardization" class="pt-8 max-w-full max-h-ful overflow-auto" style="width: 1000px;height: 500px;">
+    <div id="react-entry-point">
+        <div id="_dash-global-error-container" class="_dash-global-error-container">
+            Loading...
+        </div>
+    </div>
+    {{ querydata|safe }}
+</div>
+
+{% endblock %}
+
+
+
+

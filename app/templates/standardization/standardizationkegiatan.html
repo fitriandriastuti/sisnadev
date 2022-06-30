@@ -1,0 +1,18 @@
+{% extends 'layout_main.html' %}
+
+{% block body %}
+
+<div id="tableStandardization" class="pt-8 max-w-full max-h-ful overflow-auto" style="width: 1200px;height: 1000px;">
+    <div id="react-entry-point">
+        <div id="_dash-global-error-container" class="_dash-global-error-container">
+            Loading...
+        </div>
+    </div>
+    {{ querydata|safe }}
+</div>
+
+{% endblock %}
+
+
+
+

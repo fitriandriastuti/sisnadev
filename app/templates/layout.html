@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SISNA - Sistem Standarisasi Nomenklatur APBD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static',path='images/logo-sisna-favicon.png') }}" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+
+    <link rel="stylesheet" type="text/css" href= "{{ url_for('static',path='css/main_production.css') }}">
+<!--    <link rel="stylesheet" type="text/css" href= "{{ url_for('static',path='css/main.css') }}">-->
+
+    <style>
+      /*html, body { font-family: "Inter", sans-serif;}*/
+      @media (min-width: 1024px) {
+          .top-navbar {
+              display: inline-flex !important;
+          }
+      }
+      .bg-green-400 {
+          --tw-bg-opacity: 1;
+          background-color: rgb(101 163 13);
+      }
+      .bg-lime-900 {
+          --tw-bg-opacity: 1;
+          background-color: rgb(54 83 20);
+      }
+    </style>
+
+</head>
+<body class="font-sans antialiased tracking-tight text-tiny">
+
+    {% include 'navbar.html' %}
+    <div class="max-w-7xl md:mx-auto mt-2 mb-2">
+        {% block body %}{% endblock %}
+    </div>
+    {% include 'footer.html' %}
+
+    <style>
+        .active{
+            display: block;
+        }
+    </style>
+
+</body>
+<script src="//unpkg.com/alpinejs" defer></script>
+</html>

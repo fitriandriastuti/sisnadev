@@ -1,0 +1,14 @@
+{% extends 'layout_main.html' %}
+
+{% block body %}
+
+<div class="max-w-screen-2xl overflow-hidden">
+    <div id="react-entry-point">
+        <div class="_dash-global-error-container">
+            Loading...
+        </div>
+    </div>
+    {{ data_anggaranbynamaaplikasi|safe }}
+</div>
+
+{% endblock %}
