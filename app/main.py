@@ -306,13 +306,13 @@ async def aakunanggaran(request: Request, db: Session = Depends(get_db)):
             "email": user['email'],
             "photo": user['picture'],
         }
-        from app.dashapp import apemdafungsianggaran
-        dash_app_apemdafungsianggaran = apemdafungsianggaran(
-            requests_pathname_prefix="/dashapemdafungsianggaran/")
-        app.mount("/dashapemdafungsianggaran", WSGIMiddleware(dash_app_apemdafungsianggaran.server))
+        from app.dashapp import aakunanggaran
+        dash_app_aakunanggaran = aakunanggaran(
+            requests_pathname_prefix="/dashaakunanggaran/")
+        app.mount("/dashaakunanggaran", WSGIMiddleware(dash_app_aakunanggaran.server))
 
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(dash_app_apemdafungsianggaran.index(), 'html.parser')
+        soup = BeautifulSoup(dash_app_aakunanggaran.index(), 'html.parser')
         querydata = soup.footer
 
     else:
@@ -329,13 +329,13 @@ async def asubkegiatananggaran(request: Request, db: Session = Depends(get_db)):
             "email": user['email'],
             "photo": user['picture'],
         }
-        from app.dashapp import apemdafungsianggaran
-        dash_app_apemdafungsianggaran = apemdafungsianggaran(
-            requests_pathname_prefix="/dashapemdafungsianggaran/")
-        app.mount("/dashapemdafungsianggaran", WSGIMiddleware(dash_app_apemdafungsianggaran.server))
+        from app.dashapp import asubkegiatananggaran
+        dash_app_asubkegiatananggaran = asubkegiatananggaran(
+            requests_pathname_prefix="/dashasubkegiatananggaran/")
+        app.mount("/dashasubkegiatananggaran", WSGIMiddleware(dash_app_asubkegiatananggaran.server))
 
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(dash_app_apemdafungsianggaran.index(), 'html.parser')
+        soup = BeautifulSoup(dash_app_asubkegiatananggaran.index(), 'html.parser')
         querydata = soup.footer
 
     else:
