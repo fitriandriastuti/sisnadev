@@ -1,10 +1,9 @@
 
-<nav
-class="z-0 relative"
+<nav class=""
 x-data="{open:false,menu:false, lokasi:false}">
-  <div class="relative z-10 bg-green-400 shadow">
+  <div class="bg-green-400 shadow">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-      <div class="relative flex items-center justify-between h-16">
+      <div class="flex items-center justify-between h-16">
         <div class="flex items-center px-2 lg:px-0">
           <a class="flex-shrink-0" href="/">
             <img class="block lg:hidden h-12 w-16" src="{{ url_for('static',path='images/logo-sisna.png') }}" alt="SISNA">
@@ -15,7 +14,8 @@ x-data="{open:false,menu:false, lokasi:false}">
               <a href="/" class="{% if request.path == '/' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Home </a>
               {% if data.email %}
 <!--              <a href="/standardizationakun" class="{% if request.path == '/standardizationakun' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Standardization </a>-->
-              <a href="/preprocessing" class="{% if request.path == '/dataprocessing' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Data Processing </a>
+              <a href="/dashboard" class="{% if request.path == '/dashboard' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Dashboard </a>
+              <a href="/similarityscore" class="{% if request.path == '/similarityscore' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Data Processing </a>
               <a href="/apemdafungsianggaran" class="{% if request.path == '/datavisualization' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Data Visualization </a>
               {% endif %}
               <a href="/about" class="{% if request.path == '/about' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> About </a>
@@ -64,6 +64,7 @@ x-data="{open:false,menu:false, lokasi:false}">
       <div class="px-2 pt-2 pb-3">
         <a href="/" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">Home </a>
 <!--        <a href="/standardizationakun" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">Standardization </a>-->
+        <a href="/dashboard" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">Dashboard </a>
         <a href="/preprocessing" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">Data Processing </a>
         <a href="/apemdafungsianggaran" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">Data Visualization </a>
         <a href="/about" class="mt-1 block px-3 py-2 rounded-md text-white font-semibold font-medium hover:bg-green-600 focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out">About </a>

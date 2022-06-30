@@ -23,6 +23,8 @@ from dotenv import load_dotenv
 load_dotenv()
 import certifi
 
+import plotly.graph_objects as go
+
 DEBUG = environ['DEBUG']
 
 def connecttodatabase():
@@ -621,6 +623,74 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     app.layout = layout
 
     return app
+
+def similarityscore(requests_pathname_prefix: str = None) -> dash.Dash:
+    server = flask.Flask(__name__)
+    server.secret_key = os.environ.get('secret_key', 'secret')
+
+    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix)
+
+    app.scripts.config.serve_locally = False
+    dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
+
+    @app.callback(
+        Output(component_id='scatter_graph', component_property='figure'), Input('intermediate-value', 'data')
+        # [Input(component_id='my_dropdown', component_property='value')]
+    )
+    def update_graph(data):
+        query = db['a_score_similarity_subkegiatan'].aggregate([
+            {'$match': {'score': {'$ne': float('NaN')},'freq_count': {'$ne': float('NaN')}}},
+            {'$addFields': {'convertedscore': {'$toDouble': "$score"}}},
+            {"$group": {
+                "_id": {'score': '$convertedscore'},
+                "freq_count": {"$sum": "$freq_count"}}},
+            {'$sort': {'_id.convertedscore': 1}}
+        ])
+        result = []
+        for q in list(query):
+            r = {
+                'score': q['_id']['score'],
+                'freq_count': q['freq_count'],
+            }
+            result.append(r)
+        print(result)
+        df_ = pd.DataFrame(result)
+        df = df_.iloc[:, 0:]
+        # fig = go.Figure(data=[go.Scatter(
+        #     x=[1, 2, 3, 4], y=[10, 11, 12, 13],
+        #     mode='markers',
+        #     marker=dict(
+        #         color=['rgb(93, 164, 214)', 'rgb(255, 144, 14)',
+        #                'rgb(44, 160, 101)', 'rgb(255, 65, 54)'],
+        #         opacity=[1, 0.8, 0.6, 0.4],
+        #         size=[40, 60, 80, 100],
+        #     )
+        # )])
+        fig = go.Figure(data=[go.Scatter(
+            x=df['score'], y=df['freq_count'],
+            mode='markers',
+            marker=dict(
+                # color=['rgb(93, 164, 214)', 'rgb(255, 144, 14)',
+                #        'rgb(44, 160, 101)', 'rgb(255, 65, 54)'],
+                # opacity=[1, 0.8, 0.6, 0.4],
+                size=5,
+            )
+        )])
+        return (fig)
+
+    layout = html.Div([
+        dcc.Graph(id='scatter_graph'),
+        # dcc.Graph(id='bar_chart'),
+        dcc.Store(id='intermediate-value')
+    ])
+
+    app.layout = layout
+
+    return app
+
+
+
+
 
 
 

@@ -236,6 +236,27 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
         data = {}
     return templates.TemplateResponse("dashboard.html", {"request": request, "data": data, "querydata":querydata})
 
+@app.get('/similarityscore', include_in_schema=False)
+async def similarityscore(request: Request, db: Session = Depends(get_db)):
+    user = request.session.get('user')
+    if user is not None:
+        data = {
+            "name": user['name'],
+            "email": user['email'],
+            "photo": user['picture'],
+        }
+        from app.dashapp import similarityscore
+        dash_app_similarityscore = similarityscore(
+            requests_pathname_prefix="/dashsimilarityscore/")
+        app.mount("/dashsimilarityscore", WSGIMiddleware(dash_app_similarityscore.server))
+
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(dash_app_similarityscore.index(), 'html.parser')
+        querydata = soup.footer
+    else:
+        data = {}
+    return templates.TemplateResponse("visualization.html", {"request": request, "data": data, "querydata":querydata})
+
 @app.get('/standardizationakun', include_in_schema=False)
 async def standardizationakun(request: Request, db: Session = Depends(get_db)):
     user = request.session.get('user')

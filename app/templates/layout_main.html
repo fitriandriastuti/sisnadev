@@ -33,9 +33,11 @@
 </head>
 <body class="font-sans antialiased tracking-tight text-tiny">
 
+    <div class="sticky top-0 z-50">
     {% include 'navbar.html' %}
+    </div>
 
-    <div class="flex">
+    <div class="relative flex">
         <div class="hidden md:block flex-none py-5 px-5">
             {% include 'navbar_side.html' %}
         </div>
