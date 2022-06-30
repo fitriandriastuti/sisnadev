@@ -29,7 +29,6 @@ app/mongodb.py
 app/pepotest.py
 app/sort_filter_select.py
 
-
 .dockerignore
 
 notes.txt
