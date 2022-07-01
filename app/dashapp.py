@@ -502,7 +502,7 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
                                     'then': {'$toDouble': "$nilaianggaran"},
                                     'else': 0
                                 }},
-                                'anggaranifrastruktur': {'$cond': {
+                                'anggaraninfrastruktur': {'$cond': {
                                     'if': {
                                         '$eq': ["$infrastruktur", 'infrastruktur']
                                     },
