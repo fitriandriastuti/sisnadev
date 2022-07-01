@@ -141,7 +141,7 @@ async def auth(request: Request, db = Depends(get_db)):
     except Exception as e:
         print(e)
 
-    return RedirectResponse(url='/dashboard')
+    return RedirectResponse(url='/dashboardall')
 
 @app.route('/signup')
 async def signup(request: Request):
@@ -215,8 +215,8 @@ async def about(request: Request, db: Session = Depends(get_db)):
         data = {}
     return templates.TemplateResponse("about.html", {"request": request, "data": data})
 
-@app.get('/dashboard', include_in_schema=False)
-async def dashboard(request: Request, db: Session = Depends(get_db)):
+@app.get('/dashboardall', include_in_schema=False)
+async def dashboardall(request: Request, db: Session = Depends(get_db)):
     user = request.session.get('user')
     if user is not None:
         data = {
