@@ -224,8 +224,8 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "email": user['email'],
             "photo": user['picture'],
         }
-        from app.dashapp import dashboard
-        dash_app_dashboard = dashboard(
+        from app.dashapp import dashdashboardall
+        dash_app_dashboard = dashdashboardall(
             requests_pathname_prefix="/dashdashboard/")
         app.mount("/dashdashboard", WSGIMiddleware(dash_app_dashboard.server))
 

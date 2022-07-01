@@ -713,11 +713,12 @@ def asubkegiatananggaran(requests_pathname_prefix: str = None) -> dash.Dash:
 
     return app
 
-def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
+def dashdashboardall(requests_pathname_prefix: str = None) -> dash.Dash:
     server = flask.Flask(__name__)
     server.secret_key = os.environ.get('secret_key', 'secret')
 
-    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix,external_stylesheets=[dbc.themes.GRID])
+    # app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix,external_stylesheets=[dbc.themes.GRID])
+    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix)
 
     app.scripts.config.serve_locally = False
     dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
@@ -800,62 +801,28 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
         )
         return (piechart)
 
-    # @app.callback(
-    #     Output(component_id='bar_chart_pemdaanggaran', component_property='figure'), Input('intermediate-value', 'data')
-    #     # [Input(component_id='my_dropdown', component_property='value')]
-    # )
-    # def update_graph(data):
-    #     query = db['a_pemda_anggaran'].aggregate([
-    #         # {'$match': {'namaaplikasi': { '$exists': 'true', '$ne': None}}},
-    #         # {'$project': {'kodepemdaprov': { '$substr': ["$kodepemda", 0, 2]}}},
-    #         {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"},'kodepemdaprov': { '$substr': ["$kodepemda", 0, 2]}}},
-    #         {'$lookup': {'from': 'm_pemdaprov','localField':'prov','foreignField': "kodepemdaprov",'as': "a"}},
-    #         {"$group": {
-    #             "_id": {'kodepemdaprov':'$kodepemdaprov','newnamapemda':'$a.newnamapemda',
-    #                     # 'kodepemda': '$kodepemda','namapemda': '$namapemda'
-    #                     },
-    #             "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-    #         {'$sort': {'_id.kodepemdaprov': 1}}
-    #     ])
-    #     result = []
-    #     for q in list(query):
-    #         r = {
-    #             # 'kodepemdaprov': '[' + q['_id']['kodepemdaprov'] + '] ' + q['_id']['newnamapemda'],
-    #             'kodepemdaprov': q['_id']['kodepemdaprov'] ,
-    #             'newnamapemda': q['_id']['newnamapemda'] ,
-    #             'nilaianggaran': q['nilaianggaran']
-    #         }
-    #         result.append(r)
-    #     print(result)
-    #     df_ = pd.DataFrame(result)
-    #     df = df_.iloc[:, 0:]
-    #     dff = df
-    #     print(dff)
-    #     barchart = px.bar(
-    #         df,
-    #         x='newnamapemda',
-    #         y='nilaianggaran',
-    #         text_auto='.2s',
-    #         title='Anggaran Berdasarkan Kode Pemda Provinsi'
-    #     )
-    #     return (barchart)
-
     @app.callback(
-        Output(component_id='bar_chart', component_property='figure'), Input('intermediate-value', 'data')
+        Output(component_id='bar_chart_pemdaanggaran', component_property='figure'), Input('intermediate-value', 'data')
     )
-    def update_graph(data):
-        query = db['a_namaaplikasi_anggaran'].aggregate([
-            {'$match': {'namaaplikasi': { '$exists': 'true', '$ne': None}}},
-            {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
+    def update_graph_bar_chart_pemdaanggaran(data):
+        query = db['a_pemda_anggaran'].aggregate([
+            # {'$match': {'namaaplikasi': { '$exists': 'true', '$ne': None}}},
+            # {'$project': {'kodepemdaprov': { '$substr': ["$kodepemda", 0, 2]}}},
+            {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"},'kodepemdaprov': { '$substr': ["$kodepemda", 0, 2]}}},
+            {'$lookup': {'from': 'm_pemdaprov','localField':'prov','foreignField': "kodepemdaprov",'as': "a"}},
             {"$group": {
-                "_id": {'namaaplikasi': '$namaaplikasi'},
+                "_id": {'kodepemdaprov':'$kodepemdaprov','newnamapemda':'$a.newnamapemda',
+                        # 'kodepemda': '$kodepemda','namapemda': '$namapemda'
+                        },
                 "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-            {'$sort': {'_id.namaaplikasi': 1}}
+            {'$sort': {'_id.kodepemdaprov': 1}}
         ])
         result = []
         for q in list(query):
             r = {
-                'namaaplikasi': q['_id']['namaaplikasi'],
+                # 'kodepemdaprov': '[' + q['_id']['kodepemdaprov'] + '] ' + q['_id']['newnamapemda'],
+                'kodepemdaprov': q['_id']['kodepemdaprov'] ,
+                'newnamapemda': q['_id']['newnamapemda'] ,
                 'nilaianggaran': q['nilaianggaran']
             }
             result.append(r)
@@ -864,14 +831,47 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
         df = df_.iloc[:, 0:]
         dff = df
         print(dff)
-        barchart_ = px.bar(
+        barchart = px.bar(
             df,
-            x='namaaplikasi',
+            x='newnamapemda',
             y='nilaianggaran',
             text_auto='.2s',
-            title='Anggaran Berdasarkan Nama Aplikasi'
+            title='Anggaran Berdasarkan Kode Pemda Provinsi'
         )
-        return (barchart_)
+        return (barchart)
+
+    # @app.callback(
+    #     Output(component_id='bar_chart', component_property='figure'), Input('intermediate-value', 'data')
+    # )
+    # def update_graph(data):
+    #     query = db['a_namaaplikasi_anggaran'].aggregate([
+    #         {'$match': {'namaaplikasi': { '$exists': 'true', '$ne': None}}},
+    #         {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
+    #         {"$group": {
+    #             "_id": {'namaaplikasi': '$namaaplikasi'},
+    #             "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
+    #         {'$sort': {'_id.namaaplikasi': 1}}
+    #     ])
+    #     result = []
+    #     for q in list(query):
+    #         r = {
+    #             'namaaplikasi': q['_id']['namaaplikasi'],
+    #             'nilaianggaran': q['nilaianggaran']
+    #         }
+    #         result.append(r)
+    #     print(result)
+    #     df_ = pd.DataFrame(result)
+    #     df = df_.iloc[:, 0:]
+    #     dff = df
+    #     print(dff)
+    #     barchart_ = px.bar(
+    #         df,
+    #         x='namaaplikasi',
+    #         y='nilaianggaran',
+    #         text_auto='.2s',
+    #         title='Anggaran Berdasarkan Nama Aplikasi'
+    #     )
+    #     return (barchart_)
 
     # row_content_1 = [
     #     dbc.Col(table_fungsi),
@@ -898,8 +898,8 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     layout = html.Div([
         table_fungsi,
         dcc.Graph(id='the_graph'),
-        # dcc.Graph(id='bar_chart_pemdaanggaran'),
-        dcc.Graph(id='bar_chart'),
+        dcc.Graph(id='bar_chart_pemdaanggaran'),
+        # dcc.Graph(id='bar_chart'),
         dcc.Store(id='intermediate-value')
     ])
 
