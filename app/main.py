@@ -144,7 +144,7 @@ async def auth(request: Request, db = Depends(get_db)):
         print(e)
 
     #https://tutorialmeta.com/question/how-to-redirect-to-dynamic-url-inside-fastapi-endpoint
-    redirect_url = request.url_for('dashboardall')
+    redirect_url = request.url_for('/')
 
     return RedirectResponse(redirect_url)
 
@@ -223,10 +223,6 @@ async def about(request: Request, db: Session = Depends(get_db)):
 
 @app.get('/dashboardall', include_in_schema=False)
 async def dashboardall(request: Request, db: Session = Depends(get_db)):
-    DEBUG = environ['DEBUG']
-    if DEBUG==0:
-        from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-        app.add_middleware(HTTPSRedirectMiddleware)
     user = request.session.get('user')
     if user is not None:
         data = {
