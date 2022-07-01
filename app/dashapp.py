@@ -826,7 +826,7 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
                 'nilaianggaran': q['nilaianggaran']
             }
             result.append(r)
-        # print(result)
+        print(result)
         df_ = pd.DataFrame(result)
         df = df_.iloc[:, 0:]
         dff = df
