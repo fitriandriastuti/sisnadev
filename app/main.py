@@ -136,12 +136,17 @@ async def auth(request: Request, db = Depends(get_db)):
     email = data['email']
     try:
         if (user := await db["user"].find_one({"email": email})) is None:
-            return RedirectResponse(url='/createuser')
+            # return RedirectResponse(url='/createuser')
+            redirect_url = request.url_for('createuser')
+            return RedirectResponse(redirect_url)
 
     except Exception as e:
         print(e)
 
-    return RedirectResponse(url='/')
+    #https://tutorialmeta.com/question/how-to-redirect-to-dynamic-url-inside-fastapi-endpoint
+    redirect_url = request.url_for('dashboardall')
+
+    return RedirectResponse(redirect_url)
 
 @app.route('/signup')
 async def signup(request: Request):
@@ -155,7 +160,8 @@ async def authorize(request: Request):
     request.session['user'] = dict(user)
     print(token)
     print(user)
-    return RedirectResponse(url='/createuser')
+    redirect_url = request.url_for('createuser')
+    return RedirectResponse(redirect_url)
 
 @app.route('/logout')
 async def logout(request: Request):

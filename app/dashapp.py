@@ -24,6 +24,7 @@ load_dotenv()
 import certifi
 
 import plotly.graph_objects as go
+import plotly.express as px
 
 DEBUG = environ['DEBUG']
 
@@ -436,11 +437,13 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
         dcc.Loading(
             id="loading-1",
             type="default",
-            children=html.Div(id="loading-output-1")
+            children=html.Div("Data Anggaran Menurut Fungsi Nasional",id="loading-output-1")
         ),
         html.Table(id='table'),
         html.Div(id="graph"),
+        html.Div(id="graphbelanja"),
         # dcc.Graph(id='graph'),
+        # dcc.Graph(id='graphbelanja'),
         dcc.Store(id='intermediate-value')
     ])
 
@@ -478,7 +481,7 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
                     "_id": {'kodepemda': '$kodepemda', 'namapemda': '$namapemda', 'kode_fungsi': "$kode_fungsi",
                             'nama_fungsi': "$nama_fungsi"},
                     "nilaianggaran": {"$sum": "$convertedAnggaran"},'anggaranpendidikan': {"$sum": "$anggaranpendidikan"},'anggarankesehatan': {"$sum": "$anggarankesehatan"},'anggaraninfrastruktur': {"$sum": "$anggaraninfrastruktur"}}},
-                {'$sort': {'_id.kode_fungsi': 1}}
+                {'$sort': {'_id.kodepemda': 1}}
             ])
         else:
             query = db['a_pemda_fungsi_belanja_agregate5jutarow'].aggregate([
@@ -514,7 +517,7 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
                 {"$group": {
                     "_id": {'kodepemda': '$kodepemda','namapemda': '$namapemda', 'kode_fungsi': "$kode_fungsi", 'nama_fungsi': "$nama_fungsi"},
                     "nilaianggaran": {"$sum": "$convertedAnggaran"},'anggaranpendidikan': {"$sum": "$anggaranpendidikan"},'anggarankesehatan': {"$sum": "$anggarankesehatan"},'anggaraninfrastruktur': {"$sum": "$anggaraninfrastruktur"}}},
-                {'$sort': {'_id.kode_fungsi': 1}}
+                {'$sort': {'_id.kodepemda': 1}}
             ])
         result = []
         for q in list(query):
@@ -529,7 +532,7 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
                 'anggaraninfrastruktur': q['anggaraninfrastruktur'],
             }
             result.append(r)
-        print(result)
+        # print(result)
         df_ = pd.DataFrame(result)
         df = df_.iloc[:, 0:]
 
@@ -560,6 +563,7 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
     def create_graph(dff):
         print(dff["nama_fungsi"])
         print(dff["nilaianggaran"])
+        namawilayah = dff["namapemda"][0] if len(dff["namapemda"])>=14000 else 'Nasional'
         colors = '#7FDBFF'
         graph = dcc.Graph(
                     figure={
@@ -578,11 +582,29 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
                                 # "title": {"text": 'column'}
                             },
                             # "height": 250,
-                            'title': 'Graph Anggaran Menurut Fungsi Wilayah '+dff["namapemda"][0]
+                            'title': 'Graph Anggaran Menurut Fungsi '+namawilayah
                         }
                     }
                 )
+        return graph
 
+    def create_graph_belanja(dff):
+        # print(dff["nama_fungsi"])
+        # print(dff["nilaianggaran"])
+        namawilayah = dff["namapemda"][0] if len(dff["namapemda"])>=14000 else 'Nasional'
+        colors = '#7FDBFF'
+        graph = dcc.Graph(
+            figure={
+                'data': [
+                    {'x': dff["nama_fungsi"], 'y': dff["anggaranpendidikan"], 'type': 'bar', 'name': 'Belanja Pendidikan','hovertemplate' : 'y: %{y}'+'<br>x: %{x}<br>'+'Belanja Pendidikan'},
+                    {'x': dff["nama_fungsi"], 'y': dff["anggarankesehatan"], 'type': 'bar', 'name': 'Belanja Kesehatan','hovertemplate' : 'y: %{y}'+'<br>x: %{x}<br>'+'Belanja Kesehatan'},
+                    {'x': dff["nama_fungsi"], 'y': dff["anggaraninfrastruktur"], 'type': 'bar', 'name': 'Belanja Infrastruktur','hovertemplate' : 'y: %{y}'+'<br>x: %{x}<br>'+'Belanja Infrastruktur'},
+                ],
+                'layout': {
+                    'title': 'Anggaran Menurut Alokasi Belanja Pendidikan, Kesehatan, dan Infrastruktur'
+                }
+            }
+        )
         return graph
 
     @app.callback(Output('intermediate-value', 'data'), Input('dropdown', 'value'))
@@ -600,13 +622,20 @@ def apemdafungsibelanja(requests_pathname_prefix: str = None) -> dash.Dash:
     @app.callback(Output('graph', 'children'), Input('intermediate-value', 'data'))
     def update_graph(jsonified_cleaned_data):
         dff = pd.read_json(jsonified_cleaned_data, orient='split')
-        table = create_graph(dff)
-        return table
+        graph = create_graph(dff)
+        return graph
+
+    @app.callback(Output('graphbelanja', 'children'), Input('intermediate-value', 'data'))
+    def update_graphbelanja(jsonified_cleaned_data):
+        dff = pd.read_json(jsonified_cleaned_data, orient='split')
+        graph = create_graph_belanja(dff)
+        return graph
 
     @app.callback(Output("loading-output-1", "children"), Input("dropdown", "value"))
     def input_triggers_spinner(value):
         time.sleep(1)
-        return 'Data Anggaran Menurut Fungsi Wilayah '+str(value)
+        namawilayah = value if value is not None else 'Nasional'
+        return 'Data Anggaran Menurut Fungsi '+str(namawilayah)
 
     return app
 
