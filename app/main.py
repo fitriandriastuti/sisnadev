@@ -141,7 +141,7 @@ async def auth(request: Request, db = Depends(get_db)):
     except Exception as e:
         print(e)
 
-    return RedirectResponse(url='/dashboardall')
+    return RedirectResponse(url='/')
 
 @app.route('/signup')
 async def signup(request: Request):
