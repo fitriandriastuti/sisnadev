@@ -223,6 +223,10 @@ async def about(request: Request, db: Session = Depends(get_db)):
 
 @app.get('/dashboardall', include_in_schema=False)
 async def dashboardall(request: Request, db: Session = Depends(get_db)):
+    DEBUG = environ['DEBUG']
+    if DEBUG==0:
+        from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+        app.add_middleware(HTTPSRedirectMiddleware)
     user = request.session.get('user')
     if user is not None:
         data = {
