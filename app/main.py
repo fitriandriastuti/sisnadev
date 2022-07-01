@@ -144,9 +144,9 @@ async def auth(request: Request, db = Depends(get_db)):
         print(e)
 
     #https://tutorialmeta.com/question/how-to-redirect-to-dynamic-url-inside-fastapi-endpoint
-    redirect_url = request.url_for('/')
+    redirect_url = request.url_for('dashboardall')
 
-    return RedirectResponse(redirect_url)
+    return RedirectResponse('/')
 
 @app.route('/signup')
 async def signup(request: Request):
