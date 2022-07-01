@@ -325,6 +325,29 @@ async def apemdafungsianggaran(request: Request, db: Session = Depends(get_db)):
         data = {}
     return templates.TemplateResponse("visualization.html", {"request": request, "data": data, "querydata":querydata})
 
+@app.get('/apemdafungsibelanja', include_in_schema=False)
+async def apemdafungsibelanja(request: Request, db: Session = Depends(get_db)):
+    user = request.session.get('user')
+    querydata = {}
+    if user is not None:
+        data = {
+            "name": user['name'],
+            "email": user['email'],
+            "photo": user['picture'],
+        }
+        from app.dashapp import apemdafungsibelanja
+        dash_app_apemdafungsibelanja = apemdafungsibelanja(
+            requests_pathname_prefix="/dashapemdafungsibelanja/")
+        app.mount("/dashapemdafungsibelanja", WSGIMiddleware(dash_app_apemdafungsibelanja.server))
+
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(dash_app_apemdafungsibelanja.index(), 'html.parser')
+        querydata = soup.footer
+
+    else:
+        data = {}
+    return templates.TemplateResponse("visualization.html", {"request": request, "data": data, "querydata":querydata})
+
 @app.get('/aakunanggaran', include_in_schema=False)
 async def aakunanggaran(request: Request, db: Session = Depends(get_db)):
     user = request.session.get('user')
