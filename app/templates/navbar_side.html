@@ -93,7 +93,7 @@
                               clip-rule="evenodd"></path>
                     </svg>
                 </button>
-                <ul id="dropdown-example" class="{% if request.path != '/apemdafungsianggaran' and request.path != '/aakunanggaran' and request.path != '/asubkegiatananggaran' %} hidden {% endif %} py-2 space-y-2">
+                <ul id="dropdown-example" class="{% if request.path != '/apemdafungsianggaran' and request.path != '/apemdafungsibelanja' and request.path != '/aakunanggaran' and request.path != '/asubkegiatananggaran' %} hidden {% endif %} py-2 space-y-2">
                     <li>
                         <a href="/apemdafungsianggaran"
                            class="{% if request.path == '/apemdafungsianggaran' %} bg-green-200 text-white-500 {% endif %} flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 pl-11">Anggaran Menurut Fungsi</a>
