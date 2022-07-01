@@ -498,7 +498,7 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     server = flask.Flask(__name__)
     server.secret_key = os.environ.get('secret_key', 'secret')
 
-    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix,external_stylesheets=[dbc.themes.BOOTSTRAP])
+    app = dash.Dash(__name__, server=server, requests_pathname_prefix=requests_pathname_prefix,external_stylesheets=[dbc.themes.GRID])
 
     app.scripts.config.serve_locally = False
     dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
@@ -607,7 +607,7 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
                 'nilaianggaran': q['nilaianggaran']
             }
             result.append(r)
-        print(result)
+        # print(result)
         df_ = pd.DataFrame(result)
         df = df_.iloc[:, 0:]
         dff = df
@@ -653,6 +653,28 @@ def dashboard(requests_pathname_prefix: str = None) -> dash.Dash:
     #         title='Anggaran Berdasarkan Nama Aplikasi'
     #     )
     #     return (barchart_)
+
+    # row_content_1 = [
+    #     dbc.Col(table_fungsi),
+    #     dbc.Col(dcc.Graph(id='the_graph')),
+    # ]
+    # row_content_2 = [
+    #     dbc.Col(dcc.Graph(id='bar_chart_pemdaanggaran')),
+    # ]
+    #
+    # layout = html.Div(
+    #     [
+    #         dbc.Row(
+    #             row_content_1,
+    #             justify="start",
+    #         ),
+    #         dbc.Row(
+    #             row_content_2,
+    #             justify="center",
+    #         ),
+    #         dcc.Store(id='intermediate-value')
+    #     ]
+    # )
 
     layout = html.Div([
         table_fungsi,
