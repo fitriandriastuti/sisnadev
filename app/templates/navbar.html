@@ -1,5 +1,5 @@
 
-<nav class=""
+<nav class="sticky top-0 navbar"
 x-data="{open:false,menu:false, lokasi:false}">
   <div class="bg-green-400 shadow">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
@@ -14,7 +14,7 @@ x-data="{open:false,menu:false, lokasi:false}">
               <a href="/" class="{% if request.path == '/' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Home </a>
               {% if data.email %}
 <!--              <a href="/standardizationakun" class="{% if request.path == '/standardizationakun' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Standardization </a>-->
-              <a href="/dashboardall" class="{% if request.path == '/dashboard' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Dashboard </a>
+              <a href="/dashboardall" class="{% if request.path == '/dashboardall' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Dashboard </a>
               <a href="/similarityscore" class="{% if request.path == '/similarityscore' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Data Processing </a>
               <a href="/apemdafungsianggaran" class="{% if request.path == '/apemdafungsianggaran' or request.path == '/apemdafungsibelanja' or request.path == '/aakunanggaran' or request.path == '/asubkegiatananggaran' %} bg-green-200 text-white-500 {% endif %} ml-4 px-3 py-2 rounded-md text-sm leading-5 font-medium text-gray-800 font-semibold hover:bg-green-600 hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "> Data Visualization </a>
               {% endif %}
