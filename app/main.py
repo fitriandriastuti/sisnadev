@@ -1201,6 +1201,206 @@ async def get_similarity_belanja(db: Session = Depends(get_db), api_key: APIKey 
 
     return {'status': 'berhasil run. cek database'}
 
+@app.get("/similarityfungsibelanja/", tags=["Similarity Services"])
+async def get_similarity_fungsi_belanja(db: Session = Depends(get_db), api_key: APIKey = Depends(get_api_key)):
+    from bson.objectid import ObjectId
+    import re
+    skip = 0
+    limit = 100000
+    # limit = 100
+    maximal = 530
+    # maximal = 1
+    a = 0
+
+    while a < maximal:
+        skip = a * limit
+        a += 1
+        print(skip)
+        print('pepo')
+
+        data_A2022 = await db['m_similarity_all'].find(
+            {
+                # '_id': ObjectId('62933e88087a71b7653174ba'),
+                # 'namafungsi': 'Pertahanan',
+                # 'nama_fungsi': 'perumahan dan fasilitasi umum',
+                # "kode_akun" : {'$regex': '5.2.', '$options': 'i'}
+                # "kode_akun" : {'$regex': '4.2.01.01.04.0007', '$options': 'i'}
+             },
+            # {'_id':1,'kodepemda':1,'namapemda':1,'namaaplikasi':1,'kode_fungsi':1,'nama_fungsi':1,'kode_akun':1,'nama_akun':1,'kodestdsubkegiatan_similarity':1,'namasubkegiatan_similarity':1,'nilaianggaran':1}
+        ).sort("_id", pymongo.ASCENDING).skip(skip).limit(limit).to_list(limit)
+        # print(data_A2022)
+
+        for data in data_A2022:
+            try:
+                print('start pepo')
+
+                nama_fungsi_ = data.get('namafungsi', '')
+                nama_fungsi = re.sub(r'(?:(?<=\/) | (?=\/))', '', nama_fungsi_)
+                print(nama_fungsi_, ' => ', nama_fungsi, ' - pepo')
+
+                add_field_tambahan = {}
+
+                namafungsi = nama_fungsi
+
+                if len(nama_fungsi) > 0 and nama_fungsi != '':
+                    cek_fungsi = await db['m_fungsi'].find_one({'namafungsi': nama_fungsi})
+
+                    if cek_fungsi is None:
+                        fungsi = {}
+                        cek_fungsi2 = await db['m_fungsi_other'].find_one({'namafungsi_ori': nama_fungsi})
+                        print(cek_fungsi2)
+
+                        if cek_fungsi2 is None:
+                            fungsi = await db['m_fungsi'].find(
+                                {'$text': {'$search': nama_fungsi}, },
+                                {'score': {'$meta': "textScore"}}).sort([('score', {'$meta': 'textScore'})]).limit(
+                                1).to_list(1)
+                            print(fungsi)
+                            namafungsi = fungsi[0].get('namafungsi', '')
+                            kodefungsi = fungsi[0].get('kodefungsi', '')
+                            # score_similarity_fungsi = fungsi[0].get('score', '')
+                        else:
+                            namafungsi = cek_fungsi2['fungsi_rev']
+                            kodefungsi = cek_fungsi2['kode_fungsi_rev']
+                    else:
+                        namafungsi = cek_fungsi['namafungsi']
+                        kodefungsi = cek_fungsi['kodefungsi']
+
+                    add_field_tambahan = {
+                        'kode_fungsi': kodefungsi,
+                        'nama_fungsi': namafungsi,
+                    }
+                    insert_result_similarity = data.update(add_field_tambahan)
+                    print(add_field_tambahan)
+
+                else:
+                    kodefungsi = ''
+                    namafungsi = ''
+                    add_field_tambahan = {
+                        'kode_fungsi': kodefungsi,
+                        'nama_fungsi': namafungsi,
+                    }
+                    insert_result_similarity = data.update(add_field_tambahan)
+                    print(add_field_tambahan)
+
+                namasubkegiatan_similarity = data.get('namasubkegiatan_similarity', '')
+                words_pendidikan = (await db['m_keyword_belanja'].find_one({}))['pendidikan']
+                words_kesehatan = (await db['m_keyword_belanja'].find_one({}))['kesehatan']
+                words_infrastruktur = (await db['m_keyword_belanja'].find_one({}))['infrastruktur']
+                kode_akun = data.get('kode_akun', '')
+                print('kode_akun', kode_akun)
+                _id = data.get('_id', '')
+                belanja_modal = '' if kode_akun is None or len(kode_akun) == 0 else kode_akun[:4]
+                print('akun 4 digit: ', belanja_modal)
+                # print(ph_pendidikan)
+                pendidikan = None
+                kesehatan = None
+                infrastruktur = None
+                filter = None
+
+                if namafungsi == 'pendidikan':
+                    pendidikan = 'pendidikan'
+                else:
+                    if any(w in namasubkegiatan_similarity.lower() for w in words_pendidikan):
+                        pendidikan = 'pendidikan'
+                        print('keyword: ', pendidikan, ' ada pada kalimat: ', namasubkegiatan_similarity,
+                              ' kode_akun: ',
+                              kode_akun)
+                    else:
+                        pendidikan = 'nonpendidikan'
+                        print('keyword: ', pendidikan, 'ga ada pada kalimat: ', namasubkegiatan_similarity,
+                              ' kode_akun: ',
+                              kode_akun)
+
+                if namafungsi == 'kesehatan':
+                    kesehatan = 'kesehatan'
+                else:
+                    if any(w in namasubkegiatan_similarity.lower() for w in words_kesehatan):
+                        kesehatan = 'kesehatan'
+                        print('keyword: ', kesehatan, ' ada pada kalimat: ', namasubkegiatan_similarity, ' kode_akun: ',
+                              kode_akun)
+                    else:
+                        kesehatan = 'nonkesehatan'
+                        print('keyword: ', kesehatan, 'ga ada pada kalimat: ', namasubkegiatan_similarity,
+                              ' kode_akun: ',
+                              kode_akun)
+
+                if belanja_modal == '5.2.':
+                    if namafungsi == 'perumahan dan fasilitasi umum':
+                        infrastruktur = 'infrastruktur'
+                    else:
+                        if any(w in namasubkegiatan_similarity.lower() for w in words_infrastruktur):
+                            infrastruktur = 'infrastruktur'
+                            print('keyword: ', infrastruktur, ' ada pada kalimat: ', namasubkegiatan_similarity,
+                                  ' kode_akun: ', kode_akun, '_id:', _id)
+                        else:
+                            infrastruktur = 'noninfrastruktur'
+                            print('keyword: ', infrastruktur, 'ga ada pada kalimat: ', namasubkegiatan_similarity,
+                                  ' kode_akun: ', kode_akun)
+                else:
+                    infrastruktur = 'noninfrastruktur'
+
+                cek_filter_ = await db['m_akun'].find_one({'kode_akun': kode_akun}, {'filter': 1})
+                cek_filter = cek_filter_['filter']
+                print(cek_filter)
+                if cek_filter == '1' or cek_filter == '2':
+                    filter = cek_filter
+
+                add_field_tambahan['pendidikan'] = pendidikan
+                add_field_tambahan['kesehatan'] = kesehatan
+                add_field_tambahan['infrastruktur'] = infrastruktur
+                add_field_tambahan['filter'] = filter
+
+                print(add_field_tambahan)
+
+                data = {
+                    '_id': data.get('_id', None),
+                    'kodepemda': data.get('kodepemda', None),
+                    'namapemda': data.get('namapemda', None),
+                    'tahun': data.get('tahun', None),
+                    'bulan': data.get('bulan', None),
+                    'kodeunitskpd': data.get('kodeunitskpd', None),
+                    'namaunitskpd': data.get('namaunitskpd', None),
+                    'namaaplikasi': data.get('namaaplikasi', None),
+                    'kodefungsi_ori': data.get('kodefungsi', None),
+                    'namafungsi_ori': data.get('namafungsi', None),
+                    'kodeakunutama': data.get('kodeakunutama', None),
+                    'namaakunutama': data.get('namaakunutama', None),
+                    'kodeakunkelompok': data.get('kodeakunkelompok', None),
+                    'namaakunkelompok': data.get('namaakunkelompok', None),
+                    'kodeakunjenis': data.get('kodeakunjenis', None),
+                    'namaakunjenis': data.get('namaakunjenis', None),
+                    'kodeakunobjek': data.get('kodeakunobjek', None),
+                    'namaakunobjek': data.get('namaakunobjek', None),
+                    'kodeakunrinci': data.get('kodeakunrinci', None),
+                    'namaakunrinci': data.get('namaakunrinci', None),
+                    'kodeakunsubrinci': data.get('kodeakunsubrinci', None),
+                    'namaakunsubrinci': data.get('namaakunsubrinci', None),
+                    'score_similarity_akun': data.get('score_similarity', None),
+                    'kode_akun': data.get('kode_akun', None),
+                    'nama_akun': data.get('nama_akun', None),
+                    'kodekegiatan': data.get('kodekegiatan', None),
+                    'namakegiatan': data.get('namakegiatan', None),
+                    'kodesubkegiatan': data.get('kodesubkegiatan', None),
+                    'namasubkegiatan': data.get('namasubkegiatan', None),
+                    'score_similarity_subkegiatan': data.get('score_similarity_subkegiatan', None),
+                    'kode_subkegiatan': data.get('kodestdsubkegiatan_similarity', None),
+                    'nama_subkegiatan': data.get('namasubkegiatan_similarity', None),
+                    'targetoutput': data.get('targetoutput', None),
+                    'volume': data.get('volume', None),
+                    'hargasatuan': data.get('hargasatuan', None),
+                    'nilaianggaran': data.get('nilaianggaran', None),
+                }
+
+                add_field = data.update(add_field_tambahan)
+                new_user = db["m_apbd_final_release"].insert_one(data)
+
+
+            except:
+                print('error insert')
+
+    return {'status': 'berhasil run. cek database'}
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
     uvicorn.run(app, port=port, host="0.0.0.0")

@@ -85,26 +85,26 @@ def standardization_kegiatan_datatable(requests_pathname_prefix: str = None) -> 
             {'$match': {'nilaianggaran': {'$ne': float('NaN')}, 'namapemda': value}},
             {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
             {"$group": {
-                "_id": {'namapemda': '$namapemda', 'kodestdsubkegiatan_similarity': "$kodestdsubkegiatan_similarity",
-                        'namasubkegiatan_similarity': "$namasubkegiatan_similarity"},
+                "_id": {'namapemda': '$namapemda', 'kode_subkegiatan': "$kode_subkegiatan",
+                        'nama_subkegiatan': "$nama_subkegiatan"},
                 "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-            {'$sort': {'_id.kodestdsubkegiatan_similarity': 1}}
+            {'$sort': {'_id.kode_subkegiatan': 1}}
         ])
         # anggaran_kegiatan = db['m_apbd_final'].aggregate([
         #     {'$match': {'nilaianggaran': {'$ne': float('NaN')}, 'namapemda': value}},
-        #     {'$lookup': { 'from': "m_subkegiatan", 'localField': "kodestdsubkegiatan_similarity", 'foreignField': 'kodestdsubkegiatanfull', 'as': 'namasubkegiatan' }},
+        #     {'$lookup': { 'from': "m_subkegiatan", 'localField': "kode_subkegiatan", 'foreignField': 'kodestdsubkegiatanfull', 'as': 'namasubkegiatan' }},
         #     {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
         #     {"$group": {
-        #         "_id": {'namapemda': '$namapemda', 'kodestdsubkegiatan_similarity': "$kodestdsubkegiatan_similarity", 'namasubkegiatan_similarity': "$namasubkegiatan"},
+        #         "_id": {'namapemda': '$namapemda', 'kode_subkegiatan': "$kode_subkegiatan", 'nama_subkegiatan': "$namasubkegiatan"},
         #         "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-        #     {'$sort': {'_id.kodestdsubkegiatan_similarity': 1}}
+        #     {'$sort': {'_id.kode_subkegiatan': 1}}
         # ])
         result = []
         for q in list(anggaran_kegiatan):
             r = {
                 'namapemda': q['_id']['namapemda'],
-                'kodestdsubkegiatan_similarity': q['_id']['kodestdsubkegiatan_similarity'],
-                'namasubkegiatan_similarity': q['_id']['namasubkegiatan_similarity'],
+                'kode_subkegiatan': q['_id']['kode_subkegiatan'],
+                'nama_subkegiatan': q['_id']['nama_subkegiatan'],
                 'nilaianggaran': "Rp{:,.2f}".format(q['nilaianggaran']),
             }
             result.append(r)
@@ -704,15 +704,15 @@ def asubkegiatananggaran(requests_pathname_prefix: str = None) -> dash.Dash:
         {'$match': {'nilaianggaran': {'$ne': float('NaN')}}},
         {'$addFields': {'convertedAnggaran': {'$toDouble': "$nilaianggaran"}}},
         {"$group": {
-            "_id": {'kodestdsubkegiatan_similarity': '$kodestdsubkegiatan_similarity', 'namasubkegiatan_similarity': '$namasubkegiatan_similarity'},
+            "_id": {'kode_subkegiatan': '$kode_subkegiatan', 'nama_subkegiatan': '$nama_subkegiatan'},
             "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-        {'$sort': {'_id.kodestdsubkegiatan_similarity': 1}}
+        {'$sort': {'_id.kode_subkegiatan': 1}}
     ])
     result = []
     for q in list(query):
         r = {
-            'kodestdsubkegiatan_similarity': q['_id']['kodestdsubkegiatan_similarity'],
-            'namasubkegiatan_similarity': q['_id']['namasubkegiatan_similarity'],
+            'kode_subkegiatan': q['_id']['kode_subkegiatan'],
+            'nama_subkegiatan': q['_id']['nama_subkegiatan'],
             'nilaianggaran': "Rp{:,.2f}".format(q['nilaianggaran']),
         }
         result.append(r)
