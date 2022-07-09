@@ -40,7 +40,7 @@ Just execute the Dockerfile and heroku.yml
 
 
 ## Demo SISNA - Sistem Standarisasi Nomenklatur APBD
-![SISNA - Sistem Standarisasi Nomenklatur APBD Demo] (app/static/images/sisna-demo.gif)
+![SISNA - Sistem Standarisasi Nomenklatur APBD Demo](app/static/images/sisna-demo.gif)
 
 
 [comment]: <> (This is a wonderful community of people dedicated to supporting others learning Dash. You can find me there as well under the name CharmingData.)
