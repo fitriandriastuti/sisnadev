@@ -304,7 +304,7 @@ def apemdafungsianggaran(requests_pathname_prefix: str = None) -> dash.Dash:
                     "_id": {'kodepemda': '$kodepemda', 'namapemda': '$namapemda', 'kode_fungsi': "$kode_fungsi",
                             'nama_fungsi': "$nama_fungsi"},
                     "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-                {'$sort': {'_id.kode_fungsi': 1}}
+                {'$sort': {'_id.kodepemda': 1}}
             ])
         else:
             query = db['a_pemda_fungsi_belanja_agregate5jutarow'].aggregate([
@@ -316,7 +316,7 @@ def apemdafungsianggaran(requests_pathname_prefix: str = None) -> dash.Dash:
                 {"$group": {
                     "_id": {'kodepemda': '$kodepemda','namapemda': '$namapemda', 'kode_fungsi': "$kode_fungsi", 'nama_fungsi': "$nama_fungsi"},
                     "nilaianggaran": {"$sum": "$convertedAnggaran"}}},
-                {'$sort': {'_id.kode_fungsi': 1}}
+                {'$sort': {'_id.kodepemda': 1}}
             ])
         result = []
         for q in list(query):
@@ -360,6 +360,7 @@ def apemdafungsianggaran(requests_pathname_prefix: str = None) -> dash.Dash:
         print(dff["nama_fungsi"])
         print(dff["nilaianggaran"])
         colors = '#7FDBFF'
+        namawilayah = dff["namapemda"][0] if len(dff["namapemda"])<100 else 'Nasional'
         graph = dcc.Graph(
                     figure={
                         'data': [
@@ -377,7 +378,7 @@ def apemdafungsianggaran(requests_pathname_prefix: str = None) -> dash.Dash:
                                 # "title": {"text": 'column'}
                             },
                             # "height": 250,
-                            'title': 'Graph Anggaran Menurut Fungsi Wilayah '+dff["namapemda"][0]
+                            'title': 'Graph Anggaran Menurut Fungsi Wilayah '+ namawilayah
                         }
                     }
                 )

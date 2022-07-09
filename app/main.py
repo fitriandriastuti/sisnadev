@@ -224,6 +224,7 @@ async def about(request: Request, db: Session = Depends(get_db)):
 @app.get('/dashboardall', include_in_schema=False)
 async def dashboardall(request: Request, db: Session = Depends(get_db)):
     user = request.session.get('user')
+    querydata = {}
     if user is not None:
         data = {
             "name": user['name'],
