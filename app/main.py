@@ -44,7 +44,7 @@ tags_metadata = [
         "description": "API Information of Machine Learning/ Deep Learning",
         "externalDocs": {
             "description": "Domain",
-            "url": "https://sisnadev.fitrengineer.com/",
+            "url": "https://sisnadev.herokuapp.com/",
         },
     },
 ]
